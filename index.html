@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Yeni Yıl Kutlaması</title>
+<style>
+  body {
+    margin:0; background:#000; overflow:hidden;
+    display:flex; justify-content:center; align-items:center;
+    height:100vh; color:white; font-family:sans-serif;
+  }
+  #scene { position:relative; width:100%; height:100%; }
+  .year {
+    position:absolute; top:40%; left:50%; transform:translateX(-50%);
+    font-size:120px; font-weight:bold; color:#ffeb3b;
+    transition:transform 2s ease;
+  }
+  .stickman {
+    position:absolute; bottom:20%; left:-100px;
+    width:60px; height:120px;
+    background:none; color:white; font-size:60px;
+    opacity:0; transition:left 2s ease, opacity 1s;
+  }
+  .six {
+    position:absolute; top:-200px; left:50%; transform:translateX(-50%);
+    font-size:120px; color:#f44336; font-weight:bold;
+    transition:top 2s ease;
+    opacity:0;
+  }
+  .message {
+    position:absolute; bottom:10%; left:50%; transform:translateX(-50%);
+    font-size:40px; color:#4caf50; opacity:0;
+    transition:opacity 2s ease;
+  }
+  canvas { position:absolute; top:0; left:0; width:100%; height:100%; }
+</style>
+</head>
+<body>
+<div id="scene">
+  <div class="year" id="year">2025</div>
+  <div class="stickman" id="stickman">🚶</div>
+  <div class="six" id="six">6</div>
+  <div class="message" id="msg">Yeni yılın kutlu olsun!</div>
+  <canvas id="fireworks"></canvas>
+</div>
+
+<script>
+const year = document.getElementById('year');
+const stickman = document.getElementById('stickman');
+const six = document.getElementById('six');
+const msg = document.getElementById('msg');
+
+// Zamanlama
+setTimeout(()=>{ stickman.style.opacity=1; stickman.style.left="40%"; },1000);
+setTimeout(()=>{ year.style.transform="translateX(-50%) translateX(80px)"; },3000);
+setTimeout(()=>{ six.style.opacity=1; six.style.top="40%"; },5000);
+setTimeout(()=>{ msg.style.opacity=1; },7000);
+
+// Basit havaifişek efekti
+const canvas=document.getElementById("fireworks");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+function Firework(x,y){
+  this.x=x; this.y=y; this.particles=[];
+  for(let i=0;i<50;i++){
+    this.particles.push({
+      x:x,y:y,
+      vx:(Math.random()-0.5)*6,
+      vy:(Math.random()-0.5)*6,
+      life:100
+    });
+  }
+}
+let fireworks=[];
+function loop(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(Math.random()<0.05) fireworks.push(new Firework(Math.random()*canvas.width,Math.random()*canvas.height/2));
+  fireworks.forEach((fw,i)=>{
+    fw.particles.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.life--;
+      ctx.fillStyle="rgba(255,"+Math.floor(Math.random()*255)+",0,"+(p.life/100)+")";
+      ctx.fillRect(p.x,p.y,2,2);
+    });
+    fw.particles=fw.particles.filter(p=>p.life>0);
+    if(fw.particles.length===0) fireworks.splice(i,1);
+  });
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>
